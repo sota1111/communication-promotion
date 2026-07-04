@@ -1,0 +1,10 @@
+{
+  "name": "communication-promotion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "コミュニケーション心理的安全性低減アプリ (MVP) — マイク音量から場の雰囲気を判定し、言葉を発さないキャラクターが表情とモーションで反応する",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8000"
+  }
+}

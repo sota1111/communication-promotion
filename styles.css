@@ -1,0 +1,176 @@
+/* コミュニケーション心理的安全性低減アプリ (MVP)
+   ミニマルな背景・画面中央にキャラクター常時表示。
+   アニメーションは表情とモーションのみ（言葉は出さない）。 */
+
+:root {
+  --bg-top: #fdf6ec;
+  --bg-bottom: #f3e8d6;
+  --face: #fff3e0;
+  --face-line: #e7c9a3;
+  --cheek: #ffb3ba;
+  --ink: #5b4636;
+  --pill-bg: #ffffffcc;
+  --accent: #f6b352;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: "Hiragino Maru Gothic ProN", "Segoe UI", system-ui, sans-serif;
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stage {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  /* ミニマルな背景 */
+  background: radial-gradient(circle at 50% 30%, var(--bg-top), var(--bg-bottom));
+  overflow: hidden;
+}
+
+/* ===== キャラクター ===== */
+.character {
+  filter: drop-shadow(0 8px 14px rgba(120, 90, 50, 0.15));
+}
+.character svg { display: block; }
+
+.body { fill: #ffe1b0; stroke: var(--face-line); stroke-width: 2; }
+.face { fill: var(--face); stroke: var(--face-line); stroke-width: 2.5; }
+.eye  { fill: var(--ink); }
+.sparkle { fill: #fff; }
+.mouth { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.hair  { fill: none; stroke: var(--face-line); stroke-width: 4; stroke-linecap: round; }
+.cheek { fill: var(--cheek); opacity: 0; transition: opacity 0.1s ease; }
+.think { font-size: 34px; fill: var(--accent); font-weight: 700; opacity: 0; transition: opacity 0.1s ease; }
+.shadow { fill: rgba(120, 90, 50, 0.12); }
+
+/* 常時: やさしい呼吸モーション（アイドル） */
+.body-group { transform-origin: 100px 150px; animation: breathe 3.4s ease-in-out infinite; }
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-4px) scale(1.015); }
+}
+
+/* まばたき */
+.eyes { transform-origin: center; animation: blink 5s infinite; }
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%           { transform: scaleY(0.1); }
+}
+
+.head { transform-origin: 100px 120px; transition: transform 0.09s ease; }
+
+/* ===== 状態別の見た目（切替は100ms以内 = クラス付与で即時） ===== */
+
+/* 静か: 首をかしげる + はてな */
+.stage[data-state="quiet"] .head { transform: rotate(-14deg); }
+.stage[data-state="quiet"] .mouth { d: path("M86 122 q14 4 28 0"); }
+.stage[data-state="quiet"] .think { opacity: 1; animation: think-float 1.6s ease-in-out infinite; }
+
+/* 普通: ニコニコ + ほっぺ */
+.stage[data-state="normal"] .mouth { d: path("M82 118 q18 16 36 0"); stroke-width: 4.5; }
+.stage[data-state="normal"] .cheek { opacity: 0.85; }
+
+/* 賑やか: ぴょんぴょん跳ねる + 大きな笑顔 */
+.stage[data-state="lively"] .body-group { animation: jump 0.5s ease-in-out infinite; }
+.stage[data-state="lively"] .mouth { d: path("M78 116 q22 24 44 0"); stroke-width: 5; }
+.stage[data-state="lively"] .cheek { opacity: 1; }
+.stage[data-state="lively"] .shadow { animation: shadow-pulse 0.5s ease-in-out infinite; }
+
+@keyframes jump {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  30%      { transform: translateY(-2px) scale(1.04, 0.94); }
+  55%      { transform: translateY(-34px) scale(0.96, 1.06); }
+  80%      { transform: translateY(0) scale(1.05, 0.93); }
+}
+@keyframes shadow-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  55%      { transform: scale(0.7); opacity: 0.5; }
+}
+@keyframes think-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+/* 反応の瞬間の小さな強調（状態変化時に一度だけ） */
+.character.react { animation: pop 0.28s ease; }
+@keyframes pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* ===== HUD ===== */
+.hud {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.state-pill {
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 6px rgba(120, 90, 50, 0.12);
+}
+.meter {
+  width: 180px;
+  height: 8px;
+  border-radius: 999px;
+  background: #00000012;
+  overflow: hidden;
+}
+.meter-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #9bd4a1, var(--accent), #ff8f6b);
+  transition: width 0.12s linear;
+}
+
+/* ===== ボタン & プライバシー ===== */
+.start-btn {
+  padding: 14px 40px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(246, 179, 82, 0.4);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.2s ease;
+}
+.start-btn:active { transform: translateY(2px); box-shadow: 0 3px 8px rgba(246, 179, 82, 0.4); }
+.start-btn.running { background: #cdb79a; box-shadow: none; }
+
+.privacy {
+  position: absolute;
+  bottom: 18px;
+  margin: 0;
+  padding: 0 16px;
+  font-size: 12px;
+  opacity: 0.7;
+  text-align: center;
+}
+
+/* 状態に応じた淡い背景の色づき（雰囲気づくり・過剰にしない） */
+.stage[data-state="quiet"]  { background: radial-gradient(circle at 50% 30%, #eef3fb, #dfe7f2); }
+.stage[data-state="normal"] { background: radial-gradient(circle at 50% 30%, #fdf6ec, #f3e8d6); }
+.stage[data-state="lively"] { background: radial-gradient(circle at 50% 30%, #fff3df, #ffe1c0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .body-group, .eyes, .character.react { animation: none !important; }
+}
