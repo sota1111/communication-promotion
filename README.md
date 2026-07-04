@@ -61,6 +61,35 @@ npm test   # node --test
 | `classify.js` | 場の勢い判定ロジック（単一の真実源・テスト対象） |
 | `app.js` | マイク取得・dB計測・サンプリング・状態遷移・クールダウン制御 |
 | `test/classify.test.mjs` | 判定ロジックの単体テスト |
+| `ios/` | ネイティブ iOS アプリ（SwiftUI + AVAudioEngine） |
+
+## iOS ネイティブアプリ
+
+Web版と同じ体験（マイク音量だけで 静か/普通/賑やか を判定し、言葉なしキャラが表情・モーションで反応）を
+ネイティブ iOS（SwiftUI）で実装しています。会話は解析せず・音声は保存せず・端末内で完結します。
+
+### 使い方（Mac + Xcode 16）
+
+```bash
+# Xcode でプロジェクトを開く
+open ios/Nagomi.xcodeproj
+# 実機（または実マイクのある環境）を選んで Run → 「はじめる」→ マイクを許可
+```
+
+> シミュレータでもビルド・起動できますが、マイク入力の体感確認は実機を推奨します。
+
+### 構成（iOS）
+
+| ファイル | 役割 |
+| --- | --- |
+| `ios/Nagomi/NagomiApp.swift` | アプリのエントリポイント |
+| `ios/Nagomi/ContentView.swift` | 画面（キャラ常時表示・メーター・開始/停止・プライバシー注記） |
+| `ios/Nagomi/CharacterView.swift` | キャラクターの表情・モーション（首かしげ/ニコニコ/ぴょんぴょん） |
+| `ios/Nagomi/AudioMeter.swift` | マイク取得・RMS→dB計測・1秒サンプリング・状態遷移・3秒クールダウン |
+| `ios/Nagomi/Classifier.swift` | 場の勢い判定ロジック（`classify.js` の忠実移植） |
+
+判定アルゴリズムの正典テストは Web版と共有の `test/classify.test.mjs`（`npm test`）です。
+`Classifier.swift` は `classify.js` と同一の定数・分岐順で移植しています。
 
 ## 非機能（MVP目標）
 
@@ -71,5 +100,5 @@ npm test   # node --test
 ## スコープ外（今後）
 
 - 会話内容の解析、発話者の識別
-- ネイティブ(iOS/Android)アプリ化
+- Android ネイティブアプリ化
 - アニメーションの拡充・キャラクターのカスタマイズ
