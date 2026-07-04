@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>なごみキャラ — コミュニケーション心理的安全性アプリ (MVP)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="stage" id="stage" data-state="idle">
+    <!-- キャラクター（言葉を発さない・表情とモーションのみ） -->
+    <div class="character" id="character" aria-hidden="true">
+      <svg viewBox="0 0 200 220" width="220" height="242" role="img">
+        <!-- ぴょんぴょん時の影 -->
+        <ellipse class="shadow" cx="100" cy="208" rx="46" ry="10" />
+        <!-- 体 -->
+        <g class="body-group">
+          <path class="body" d="M62 150 q38 34 76 0 l6 46 q-44 20 -88 0 z" />
+          <!-- 顔 -->
+          <g class="head">
+            <circle class="face" cx="100" cy="96" r="62" />
+            <!-- ほっぺ（普通・賑やかで色づく） -->
+            <circle class="cheek cheek-l" cx="66" cy="112" r="11" />
+            <circle class="cheek cheek-r" cx="134" cy="112" r="11" />
+            <!-- 目 -->
+            <g class="eyes">
+              <circle class="eye eye-l" cx="78" cy="90" r="8" />
+              <circle class="eye eye-r" cx="122" cy="90" r="8" />
+              <circle class="sparkle sparkle-l" cx="81" cy="87" r="2.6" />
+              <circle class="sparkle sparkle-r" cx="125" cy="87" r="2.6" />
+            </g>
+            <!-- 口（状態でクラス切替） -->
+            <path class="mouth" d="M84 120 q16 12 32 0" />
+            <!-- 静か時のはてなマーク -->
+            <text class="think" x="150" y="52">?</text>
+            <!-- ちょんまげ的な一本毛（無邪気さ） -->
+            <path class="hair" d="M100 34 q6 -18 -4 -24 q18 4 12 26" />
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- 状態表示（ミニマル） -->
+    <div class="hud">
+      <div class="state-pill" id="statePill">待機中</div>
+      <div class="meter" aria-hidden="true"><span class="meter-fill" id="meterFill"></span></div>
+    </div>
+
+    <!-- スタート/停止（マイク許可にユーザー操作が必要） -->
+    <button class="start-btn" id="startBtn">はじめる</button>
+
+    <p class="privacy" id="privacyNote">
+      🔒 音声は保存されません／会話内容は解析しません／すべて端末内で処理します
+    </p>
+  </main>
+
+  <script src="classify.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
